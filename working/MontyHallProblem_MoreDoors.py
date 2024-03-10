@@ -1,3 +1,4 @@
+from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -29,28 +30,40 @@ def host(M, prize_index, chosen_door):
         max_host_offer = M - 2
     return max_host_offer
 
-def outcome(player, new_choice, prize_index, stats):
+def outcome(new_choice, prize_index, stats):
     if(new_choice == prize_index):
-        stats[player] += 1
-    return
+        stats += 1
+    return stats
 
-ndoors = 100 #ndoors total
-M = 10 #ndoors closed after the host played
 prize_index = 0 #the car is always in the 0th door, this simplifies the execution of the program
-simulations = 1000000
+simulations = 1000
 players = ["conservative", "switcher", "new comer"]
-stats = {players[0]: 0, players[1]: 0, players[2]: 0}
+stats = 0
 
-for i in range(simulations):
-    players_choice = np.array([random.randint(0, ndoors-1), random.randint(0, ndoors-1), 0])
+a = []
+b = []
+c = [] 
 
-    for j in range(3):
-        new_choice = game(M, players[j], players_choice[j], prize_index)
-        outcome(players[j], new_choice, prize_index, stats)
+for w in range(3, 100):
+    for z in range(2, w-1):
+        for i in range(simulations):
+            players_choice = np.array([random.randint(0, w-1), random.randint(0, w-1), 0])
+            new_choice = game(z, players[1], players_choice[1], prize_index)
+            stats = outcome(new_choice, prize_index, stats)
+        a.append(w)
+        b.append(z)
+        c.append(stats)
+        stats = 0
+fig = plt.figure(figsize = (10,10))
+ax = plt.axes(projection='3d')
+ax.grid()
 
-for k, v in stats.items():
-    v = v*100/simulations
-    print(f"{k} won {v}% of times")
+ax.scatter(a, b, c, c = 'r', s = 50)
+ax.set_title('3D Scatter Plot')
 
-plt.bar(list(stats.keys()), stats.values(), color='g')
+# Set axes label
+ax.set_xlabel('ndoors', labelpad=20)
+ax.set_ylabel('M', labelpad=20)
+ax.set_zlabel('wins over 1000', labelpad=20)
+
 plt.show()
