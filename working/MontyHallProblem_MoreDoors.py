@@ -2,36 +2,40 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-def game(player, chosen_door, prize_index):
+def game(M, player, chosen_door, prize_index):
     if (player == "conservative"):
 
         new_choice = chosen_door
 
     elif(player == "switcher"):
 
-        host_offer = host(prize_index, chosen_door)
-        new_choice = host_offer
+        max_host_offer = host(M, prize_index, chosen_door)
+        new_choice = random.randint(0, max_host_offer)
 
     elif(player == "new comer"):
 
-        new_choice = random.randint(0, 1)
+        max_host_offer = host(M, prize_index, chosen_door)
+        new_choice = random.randint(0, max_host_offer)
     
     return new_choice
 
 
-def host(prize_index, chosen_door):
+def host(M, prize_index, chosen_door):
     if(prize_index == chosen_door):
-        host_offer = chosen_door + 1
+        max_host_offer = M - 1
+    elif(chosen_door > 0 and chosen_door <= M-1):
+        max_host_offer = M - 1
     else:
-        host_offer = prize_index
-    return host_offer
+        max_host_offer = M - 2
+    return max_host_offer
 
 def outcome(player, new_choice, prize_index, stats):
     if(new_choice == prize_index):
         stats[player] += 1
     return
 
-ndoors = 100
+ndoors = 100 #ndoors total
+M = 10 #ndoors closed after the host played
 prize_index = 0 #the car is always in the 0th door, this simplifies the execution of the program
 simulations = 1000000
 players = ["conservative", "switcher", "new comer"]
@@ -41,7 +45,7 @@ for i in range(simulations):
     players_choice = np.array([random.randint(0, ndoors-1), random.randint(0, ndoors-1), 0])
 
     for j in range(3):
-        new_choice = game(players[j], players_choice[j], prize_index)
+        new_choice = game(M, players[j], players_choice[j], prize_index)
         outcome(players[j], new_choice, prize_index, stats)
 
 for k, v in stats.items():
