@@ -1,47 +1,45 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import statistics as stat
 from scipy.optimize import curve_fit
+
 def f(x):
     return x**3
 
-
-def Gauss(x, A, B, C):
-    y = A*np.exp(-((x-B)**2)/C**2)
+def sin_func(x, A, B, C):
+    y = A + B*np.sin(C/x)
     return y
 
 sigma = 2
-samples = 10000
+normalization = np.sqrt(2*np.pi*sigma**2)
 
 integrals = []
+errors = []
 solution = 2*sigma**4
 
-N = 1000
-for i in range(N):
-    xi = np.random.normal(0, sigma, samples)
+N = range(10, 1000, 10)
+for i in N:
+    xj = np.abs(np.random.normal(0, sigma, i))
 
-    integral = np.sqrt(2*np.pi*sigma**2)/2 *np.sum(abs(f(xi)))/samples
+    integral = normalization/2 *np.mean(f(xj))
+    error = normalization/2 * np.std(f(xj))/np.sqrt(i)
    # print(f"integral {integral} sol: {solution}")
     integrals.append(integral)
+    errors.append(error)
 
-h, xedges, patches = plt.hist(integrals, density=True, bins=20, label=f"mean: {stat.mean(integrals):.2f}, std: {stat.pstdev(integrals):.2f}")
-xcenters = (xedges[:-1] + xedges[1:]) / 2
+#trend as N varies
+plt.errorbar(N, integrals, errors, label = 'integrals')
+plt.axhline(y = 2*sigma**4, color = 'g', linestyle = '--', label = '$2 \sigma^4$')
+plt.xlabel("N")
 
-parameters, covariance = curve_fit(Gauss, xcenters, h)
-fit_B = sum(integrals)/len(integrals)
-variance = sum([((x - fit_B) ** 2) for x in integrals]) / len(integrals) 
-fit_C = variance ** 0.5
-fit_A = 1/np.sqrt(2*np.pi*variance)
+parameters, covariance = curve_fit(sin_func, integrals, errors)
+fit_A = 32
+fit_B = parameters[1]
+fit_C = parameters[2]
 
-print(fit_A)
-print(fit_B)
-print(fit_C)
-fit_y = Gauss(xcenters, fit_A, fit_B, fit_C)
-plt.plot(xcenters, h, 'o', label='data')
-plt.plot(xcenters, fit_y, '-', label='fit')
+fit = sin_func(integrals, fit_A, fit_B, fit_C)
 
-plt.legend(loc="upper left")
-plt.ylabel("Frequency")
-plt.xlabel("Integrals")
+plt.plot(N, fit, '-', label='fit')
+
+
 plt.legend()
 plt.show()
