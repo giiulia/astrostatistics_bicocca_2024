@@ -21,7 +21,7 @@ def error(sigma, samples):
 #gaussian distribution from 0 to 3sigma
 sigma = 2
 samples = 1000
-gauss = scipy.stats.norm(loc=0,scale=sigma)
+gauss = scipy.stats.norm(loc=0, scale=sigma)
 plt.hist(np.abs(gauss.rvs(samples)),density=True,bins=30)
 plt.plot(np.linspace(0,3*sigma,100), 2*gauss.pdf(np.linspace(0,3*sigma,100)))
 
