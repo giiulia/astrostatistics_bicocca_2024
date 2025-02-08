@@ -31,7 +31,7 @@ def outcome(player, new_choice, prize_index, stats):
         stats[player] += 1
     return
 
-ndoors = 100
+ndoors = 3
 prize_index = 0 #the car is always in the 0th door, this simplifies the execution of the program
 simulations = 1000000
 players = ["conservative", "switcher", "new comer"]
@@ -50,3 +50,4 @@ for k, v in stats.items():
 
 plt.bar(list(stats.keys()), stats.values(), color='g')
 plt.show()
+plt.savefig("Plots/MontyHall.png", format = "png", bbox_inches="tight")
